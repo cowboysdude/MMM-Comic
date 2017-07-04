@@ -12,5 +12,13 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {},
-  "description": ""
+  "description": "Calvin and Hobbes for your MagicMirror2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cowboysdude/MMM-Comic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cowboysdude/MMM-Comic/issues"
+  },
+  "homepage": "https://github.com/cowboysdude/MMM-Comic#readme"
 }
