@@ -17,12 +17,8 @@ module.exports = NodeHelper.create({
     	        }, (error, response, body) => {
             if (!error && response.statusCode === 200) {
                 parser(body, (err, result)=> {
-                	console.log(body);
-                   // if(result.hasOwnProperty('rss')){
                         var result = JSON.parse(JSON.stringify(result.feed.entry));
                         this.sendSocketNotification("COMIC_RESULT", result);
-                    ///}
-                    
                 });
             }
        });
