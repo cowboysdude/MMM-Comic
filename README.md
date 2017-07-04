@@ -1,5 +1,5 @@
 # MMM-Comic
-Calvin and Hobbes comic strip for MM2
+Calvin and Hobbes or Frazz comic strip for MM2
 
   CLONE REPO
   
@@ -11,8 +11,13 @@ Calvin and Hobbes comic strip for MM2
    CONFIG
        {
             module: 'MMM-Comic',
-            position: 'bottom_bar'
+            position: 'bottom_bar',
+            config: {
+            type: "calvin"
+            }
         }, 
+        
+        type:  can either be "calvin" or "frazz"
         
         Position anywhere you want.
         
