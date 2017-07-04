@@ -1,5 +1,5 @@
 # MMM-Comic
-Calvin and Hobbes or Frazz comic strip for MM2
+Calvin and Hobbes or Frazz comic strip for MM2.  Changes comic every 30 minutes
 
   CLONE REPO
   
