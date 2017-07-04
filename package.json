@@ -1,0 +1,16 @@
+{
+  "name": "mmm-comic",
+  "version": "1.0.0",
+  "main": "MMM-Comic.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dude",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.81.0",
+    "xml2js": "^0.4.17"
+  },
+  "devDependencies": {},
+  "description": ""
+}
