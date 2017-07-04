@@ -14,6 +14,7 @@ Module.register("MMM-Comic", {
         initialLoadDelay: 4250,
         retryDelay: 2500,
         updateInterval: 60 * 1000,
+        type: "calvin"
 
     },
 
@@ -27,7 +28,7 @@ Module.register("MMM-Comic", {
         requiresVersion: "2.1.0",
 
             //  Set locale.
-            this.url = "http://persistent.info/scraped/calvinandhobbes.xml";
+        this.url = this.getUrl();;
         this.comic = [];
         this.activeItem = 0;
         this.rotateInterval = null;
@@ -41,7 +42,7 @@ Module.register("MMM-Comic", {
         wrapper.style.maxWidth = this.config.maxWidth;
 
         if (!this.loaded) {
-            wrapper.innerHTML = "Shuffling your comic . . .";
+            wrapper.innerHTML = "Getting your "+this.config.type+" comics. . .";
             wrapper.classList.add("bright", "light", "small");
             return wrapper;
         }
@@ -54,12 +55,10 @@ Module.register("MMM-Comic", {
                 this.activeItem = 0;
             }
             var comic = this.comic[keys[this.activeItem]];
-            console.log(comic.content[0].div[0].img[0].$.src);
-            console.log(comic);
+            
             var top = document.createElement("div");
             top.classList.add("list-row");
-
-            // card # 1
+           
             var pic = document.createElement("div");
             var img = document.createElement("img");
             img.classList.add("photo");
@@ -70,6 +69,21 @@ Module.register("MMM-Comic", {
         return wrapper;
     },
 
+
+    getUrl: function() {
+         var url = null;
+         var type = this.config.type.toLowerCase();
+          
+         if (type == "calvin") {
+             url = "http://persistent.info/scraped/calvinandhobbes.xml";
+         } else if (type == "frazz") {
+             url = "http://persistent.info/scraped/frazz.xml";
+         }  else {
+             console.log("Error can't get Horoscope url" + response.statusCode);
+         }
+         return url;
+
+     },
 
     processComic: function(data) {
         this.today = data.Today;
