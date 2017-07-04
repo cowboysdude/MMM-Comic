@@ -8,7 +8,7 @@ Module.register("MMM-Comic", {
 
     // Module config defaults.
     defaults: {
-        rotateInterval: 60 * 1000, // New every 60 Min.
+        rotateInterval: 30 * 1000, // New every 30 Min.
         maxWidth: "100%",
         animationSpeed: 3000,
         initialLoadDelay: 4250,
