@@ -34,12 +34,12 @@ modules: [
   </thead>
   <tbody>
     <tr>
-      <td><code>position</code><td>
-      <td> The position of the module. <br><br><b> Example:</b> "middle_center", "lower_third", "bottom_left", "bottom_center", "bottom_right","bottom_bar", "fullscreen_above", "fullscreen_below" </td>
+      <td><code>position</code></td>
+      <td> The position of the module.<br><br><b> Example:</b> "middle_center", "lower_third", "bottom_left", "bottom_center", "bottom_right","bottom_bar", "fullscreen_above", "fullscreen_below" </td>
      </tr>
     <tr>
       <td><code>type</code></td>
-      <td> The type of comic .<br><br><b> Example:</b> "Cavin" or "frazz" </td>
+      <td> The type of comic.<br><br><b> Example:</b> "Cavin" or "frazz" </td>
     </tr>
    </tbody>
   </table>
