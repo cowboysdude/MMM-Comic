@@ -1,7 +1,30 @@
+/* MMM-Comic */
+.MMM-Comic .comic {
+	margin: 0 auto;
+	text-align: center;
+}
 
+.MMM-Comic .comic-title {
+	margin-bottom: 4px;
+	letter-spacing: 1px;
+}
 
+.MMM-Comic .comic-strip {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 4px;
+}
 
-.MMM-Comic .photo {   
-  height: 30%;         
-  width: 30%;
+.MMM-Comic .comic-gray {
+	filter: grayscale(100%);
+}
+
+/* In the left or right column, line up with that side */
+.region.left .MMM-Comic .comic {
+	margin-left: 0;
+}
+
+.region.right .MMM-Comic .comic {
+	margin-right: 0;
 }

@@ -1,123 +1,114 @@
-/* Magic Mirror
- * Module: MMM-Comic
+/* MagicMirror² Module: MMM-Comic
+ * By cowboysdude
  *
- * By Cowboysdude
- *
+ * Shows the newest Calvin and Hobbes or Frazz comic strip
+ * (or flips through the last couple of weeks of strips).
  */
 Module.register("MMM-Comic", {
+	defaults: {
+		type: "calvin",          // "calvin" or "frazz"
+		feedUrl: "",             // optional: any other persistent.info/scraped/... feed
+		showTitle: true,         // show the comic name and date above the strip
+		rotate: false,           // true = flip through recent strips instead of only the newest
+		rotateInterval: 30 * 60 * 1000,  // with rotate: true, next strip every 30 minutes
+		updateInterval: 60 * 60 * 1000,  // check for a new strip every hour
+		retryDelay: 5 * 60 * 1000,       // try again after 5 minutes if it fails
+		maxWidth: "800px",
+		grayscale: false,        // true = black and white (the Sunday strips are in color)
+		animationSpeed: 1000
+	},
 
-    // Module config defaults.
-    defaults: {
-        rotateInterval: 30 * 1000, // New every 30 Min.
-        maxWidth: "100%",
-        animationSpeed: 3000,
-        initialLoadDelay: 4250,
-        retryDelay: 2500,
-        updateInterval: 60 * 1000,
-        type: "calvin"
+	feeds: {
+		calvin: { name: "Calvin and Hobbes", url: "http://persistent.info/scraped/calvinandhobbes.xml" },
+		frazz: { name: "Frazz", url: "http://persistent.info/scraped/frazz.xml" }
+	},
 
-    },
+	getStyles () {
+		return [this.file("MMM-Comic.css")];
+	},
 
-    getStyles: function() {
-        return ["MMM-Comic.css"];
-    },
+	start () {
+		Log.info(`Starting module: ${this.name}`);
+		this.strips = [];
+		this.index = 0;
+		this.error = null;
+		const feed = this.feeds[String(this.config.type).toLowerCase()];
+		this.url = this.config.feedUrl || (feed && feed.url) || null;
+		this.comicName = feed && !this.config.feedUrl ? feed.name : "";
+		if (!this.url) return;
+		this.request();
+		setInterval(() => this.request(), this.config.updateInterval);
+		if (this.config.rotate) {
+			setInterval(() => {
+				if (this.strips.length > 1) {
+					this.index = (this.index + 1) % this.strips.length;
+					this.updateDom(this.config.animationSpeed);
+				}
+			}, this.config.rotateInterval);
+		}
+	},
 
-    start: function() {
-        Log.info("Starting module: " + this.name);
+	request () {
+		this.sendSocketNotification("COMIC_GET", { id: this.identifier, url: this.url });
+	},
 
-        requiresVersion: "2.1.0",
+	socketNotificationReceived (notification, payload) {
+		if (!payload || payload.id !== this.identifier) return;
+		if (notification === "COMIC_DATA") {
+			const newest = this.strips[0] && this.strips[0].src;
+			this.strips = payload.strips;
+			this.error = null;
+			if (!this.config.rotate || this.index >= this.strips.length) this.index = 0;
+			if (newest === this.strips[0].src && this.loadedOnce) return; // nothing new
+			this.loadedOnce = true;
+		} else if (notification === "COMIC_ERROR") {
+			this.error = payload.message;
+			clearTimeout(this.retryTimer);
+			this.retryTimer = setTimeout(() => this.request(), this.config.retryDelay);
+			if (this.strips.length) return; // keep showing the last good strip
+		}
+		this.updateDom(this.config.animationSpeed);
+	},
 
-            //  Set locale.
-        this.url = this.getUrl();;
-        this.comic = [];
-        this.activeItem = 0;
-        this.rotateInterval = null;
-        this.scheduleUpdate();
-    },
+	niceDate (iso) {
+		const d = new Date(iso);
+		if (isNaN(d)) return "";
+		return d.toLocaleDateString(config.language || "en",
+			{ weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+	},
 
-    getDom: function() {
+	getDom () {
+		const wrap = document.createElement("div");
+		wrap.className = "comic";
+		wrap.style.maxWidth = this.config.maxWidth;
 
-        var wrapper = document.createElement("div");
-        wrapper.className = "wrapper";
-        wrapper.style.maxWidth = this.config.maxWidth;
+		if (!this.url) {
+			wrap.className = "small dimmed";
+			wrap.textContent = `MMM-Comic: type must be "calvin" or "frazz" (or set feedUrl).`;
+			return wrap;
+		}
+		if (!this.strips.length) {
+			wrap.className = "small dimmed";
+			wrap.textContent = this.error ? "Comic not available right now. Trying again soon." : "Getting your comic…";
+			return wrap;
+		}
 
-        if (!this.loaded) {
-            wrapper.innerHTML = "Getting your "+this.config.type+" comics. . .";
-            wrapper.classList.add("bright", "light", "small");
-            return wrapper;
-        }
-
-        var comic = this.comic;
-
-        var keys = Object.keys(this.comic);
-        if (keys.length > 0) {
-            if (this.activeItem >= keys.length) {
-                this.activeItem = 0;
-            }
-            var comic = this.comic[keys[this.activeItem]];
-            
-            var top = document.createElement("div");
-            top.classList.add("list-row");
-           
-            var pic = document.createElement("div");
-            var img = document.createElement("img");
-            img.classList.add("photo");
-            img.src = comic.content[0].div[0].img[0].$.src;
-            pic.appendChild(img);
-            wrapper.appendChild(pic);
-        }
-        return wrapper;
-    },
-
-
-    getUrl: function() {
-         var url = null;
-         var type = this.config.type.toLowerCase();
-          
-         if (type == "calvin") {
-             url = "http://persistent.info/scraped/calvinandhobbes.xml";
-         } else if (type == "frazz") {
-             url = "http://persistent.info/scraped/frazz.xml";
-         }  else {
-             console.log("Error can't get Horoscope url" + response.statusCode);
-         }
-         return url;
-
-     },
-
-    processComic: function(data) {
-        this.today = data.Today;
-        this.comic = data;
-        this.loaded = true;
-    },
-
-    scheduleCarousel: function() {
-        console.log("Carousel of Cards fucktion!");
-        this.rotateInterval = setInterval(() => {
-            this.activeItem++;
-            this.updateDom(this.config.animationSpeed);
-        }, this.config.rotateInterval);
-    },
-
-    scheduleUpdate: function() {
-        setInterval(() => {
-            this.getComic();
-        }, this.config.updateInterval);
-        this.getComic(this.config.initialLoadDelay);
-    },
-
-    getComic: function() {
-        this.sendSocketNotification('GET_COMIC', this.url);
-    },
-
-    socketNotificationReceived: function(notification, payload) {
-        if (notification === "COMIC_RESULT") {
-            this.processComic(payload);
-            if (this.rotateInterval == null) {
-                this.scheduleCarousel();
-            }
-            this.updateDom(this.config.animationSpeed);
-        }
-        this.updateDom(this.config.initialLoadDelay);
-    },
+		const strip = this.strips[this.index];
+		if (this.config.showTitle) {
+			const t = document.createElement("div");
+			t.className = "comic-title xsmall dimmed";
+			const name = this.comicName || strip.title.split(" for ")[0] || "";
+			const date = this.niceDate(strip.date);
+			t.textContent = [name, date].filter(Boolean).join("  ·  ");
+			wrap.appendChild(t);
+		}
+		const img = document.createElement("img");
+		img.className = "comic-strip";
+		if (this.config.grayscale) img.classList.add("comic-gray");
+		img.src = strip.src;
+		img.alt = strip.title;
+		img.referrerPolicy = "no-referrer";
+		wrap.appendChild(img);
+		return wrap;
+	}
 });

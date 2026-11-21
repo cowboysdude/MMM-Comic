@@ -1,24 +1,13 @@
 {
   "name": "mmm-comic",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "description": "MagicMirror² module that shows the newest Calvin and Hobbes or Frazz comic strip.",
   "main": "MMM-Comic.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Dude",
-  "license": "MIT",
-  "dependencies": {
-    "request": "^2.81.0",
-    "xml2js": "^0.4.17"
-  },
-  "devDependencies": {},
-  "description": "Calvin and Hobbes for your MagicMirror2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cowboysdude/MMM-Comic.git"
   },
-  "bugs": {
-    "url": "https://github.com/cowboysdude/MMM-Comic/issues"
-  },
-  "homepage": "https://github.com/cowboysdude/MMM-Comic#readme"
+  "author": "cowboysdude",
+  "license": "MIT",
+  "keywords": ["MagicMirror", "comic", "Calvin and Hobbes", "Frazz"]
 }
